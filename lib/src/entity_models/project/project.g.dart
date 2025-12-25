@@ -22,13 +22,18 @@ const ProjectSchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'title': PropertySchema(
+    r'path': PropertySchema(
       id: 1,
+      name: r'path',
+      type: IsarType.string,
+    ),
+    r'title': PropertySchema(
+      id: 2,
       name: r'title',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -66,6 +71,7 @@ int _projectEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.path.length * 3;
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
 }
@@ -77,8 +83,9 @@ void _projectSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDateTime(offsets[0], object.createdAt);
-  writer.writeString(offsets[1], object.title);
-  writer.writeDateTime(offsets[2], object.updatedAt);
+  writer.writeString(offsets[1], object.path);
+  writer.writeString(offsets[2], object.title);
+  writer.writeDateTime(offsets[3], object.updatedAt);
 }
 
 Project _projectDeserialize(
@@ -90,8 +97,9 @@ Project _projectDeserialize(
   final object = Project(
     createdAt: reader.readDateTime(offsets[0]),
     id: id,
-    title: reader.readString(offsets[1]),
-    updatedAt: reader.readDateTime(offsets[2]),
+    path: reader.readString(offsets[1]),
+    title: reader.readString(offsets[2]),
+    updatedAt: reader.readDateTime(offsets[3]),
   );
   return object;
 }
@@ -108,6 +116,8 @@ P _projectDeserializeProp<P>(
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -305,6 +315,136 @@ extension ProjectQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'path',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'path',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'path',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'path',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'path',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'path',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'path',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'path',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'path',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> pathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'path',
+        value: '',
       ));
     });
   }
@@ -625,6 +765,18 @@ extension ProjectQuerySortBy on QueryBuilder<Project, Project, QSortBy> {
     });
   }
 
+  QueryBuilder<Project, Project, QAfterSortBy> sortByPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'path', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterSortBy> sortByPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'path', Sort.desc);
+    });
+  }
+
   QueryBuilder<Project, Project, QAfterSortBy> sortByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -676,6 +828,18 @@ extension ProjectQuerySortThenBy
     });
   }
 
+  QueryBuilder<Project, Project, QAfterSortBy> thenByPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'path', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterSortBy> thenByPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'path', Sort.desc);
+    });
+  }
+
   QueryBuilder<Project, Project, QAfterSortBy> thenByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -709,6 +873,13 @@ extension ProjectQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Project, Project, QDistinct> distinctByPath(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'path', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Project, Project, QDistinct> distinctByTitle(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -734,6 +905,12 @@ extension ProjectQueryProperty
   QueryBuilder<Project, DateTime, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<Project, String, QQueryOperations> pathProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'path');
     });
   }
 

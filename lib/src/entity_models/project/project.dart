@@ -10,6 +10,7 @@ class Project {
   final String title;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String path;
 
   final datasets = IsarLinks<Dataset>();
   final models = IsarLinks<TrainModel>();
@@ -19,5 +20,21 @@ class Project {
     required this.title,
     required this.createdAt,
     required this.updatedAt,
+    required this.path,
   });
+
+  Project copyWith({
+    String? title,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? path,
+  }) {
+    return Project(
+      id: id,
+      title: title ?? this.title,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      path: path ?? this.path,
+    );
+  }
 }
