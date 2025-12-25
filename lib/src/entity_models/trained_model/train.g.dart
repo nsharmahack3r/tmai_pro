@@ -56,7 +56,7 @@ const TrainModelSchema = CollectionSchema(
   getId: _trainModelGetId,
   getLinks: _trainModelGetLinks,
   attach: _trainModelAttach,
-  version: '3.1.0',
+  version: '3.1.0+1',
 );
 
 int _trainModelEstimateSize(

@@ -11,12 +11,19 @@ class ProjectListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(project.title),
-      subtitle: Text('Created on: ${project.createdAt.toLocal()}'),
-      trailing: const Icon(Icons.chevron_right),
+      leading: const Icon(Icons.folder),
+      title: Text(project.title, style: TextStyle(fontSize: 14)),
+      subtitle: Text(
+        'Created on: ${_formatDate(project.createdAt.toLocal())}',
+        style: TextStyle(fontSize: 12),
+      ),
       onTap: () {
         context.push(ProjectView.routePath, extra: project.id);
       },
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month}-${date.day}';
   }
 }

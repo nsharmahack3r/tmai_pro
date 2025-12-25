@@ -66,7 +66,7 @@ const DatasetSchema = CollectionSchema(
   getId: _datasetGetId,
   getLinks: _datasetGetLinks,
   attach: _datasetAttach,
-  version: '3.1.0',
+  version: '3.1.0+1',
 );
 
 int _datasetEstimateSize(
