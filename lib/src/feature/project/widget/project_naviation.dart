@@ -50,20 +50,29 @@ class ProjectNaviation extends ConsumerWidget {
               ),
 
               ProjectNavigationOption(
-                title: "Annotate",
-                icon: Icons.edit_note_outlined,
+                title: "Preview",
+                icon: Icons.image,
                 onTap: () {
                   ref.read(fragmentIndexProvider.notifier).update((index) => 1);
                 },
                 selected: selectedIndex == 1,
               ),
+
               ProjectNavigationOption(
-                title: "Version",
-                icon: Icons.history,
+                title: "Annotate",
+                icon: Icons.edit_note_outlined,
                 onTap: () {
                   ref.read(fragmentIndexProvider.notifier).update((index) => 2);
                 },
                 selected: selectedIndex == 2,
+              ),
+              ProjectNavigationOption(
+                title: "Version",
+                icon: Icons.history,
+                onTap: () {
+                  ref.read(fragmentIndexProvider.notifier).update((index) => 3);
+                },
+                selected: selectedIndex == 3,
               ),
 
               SizedBox(height: 24),

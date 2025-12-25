@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tmai_pro/src/entity_models/project/project.dart';
+import 'package:tmai_pro/src/feature/project/controller/import_controller.dart';
 
-class DataImportFragment extends StatelessWidget {
-  const DataImportFragment({super.key});
+class DataImportFragment extends ConsumerStatefulWidget {
+  const DataImportFragment({super.key, required this.project});
 
+  final Project project;
+
+  @override
+  ConsumerState<DataImportFragment> createState() => _DataImportFragmentState();
+}
+
+class _DataImportFragmentState extends ConsumerState<DataImportFragment> {
+  late final dataImportController = ref.read(
+    importFilesControllerProvider(widget.project),
+  );
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -35,7 +48,9 @@ class DataImportFragment extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(color: Colors.grey),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          dataImportController.importImages();
+                        },
                         child: Text("Select File(s)"),
                       ),
                       SizedBox(width: 12),
@@ -44,7 +59,9 @@ class DataImportFragment extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(color: Colors.grey),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          dataImportController.importImagesFromFolder();
+                        },
                         child: Text("Select Folder"),
                       ),
                     ],

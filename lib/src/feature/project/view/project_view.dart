@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/project/fragment/annotate_fragment.dart';
 import 'package:tmai_pro/src/feature/project/fragment/data_import_fragment.dart';
+import 'package:tmai_pro/src/feature/project/fragment/preview_fragment.dart';
 import 'package:tmai_pro/src/feature/project/fragment/version_fragment.dart';
 import 'package:tmai_pro/src/feature/project/widget/project_naviation.dart';
 import 'package:tmai_pro/src/services/db_services.dart';
@@ -39,8 +40,9 @@ class ProjectView extends ConsumerWidget {
                       flex: 4,
                       child: IndexedStack(
                         index: index,
-                        children: const [
-                          DataImportFragment(),
+                        children: [
+                          DataImportFragment(project: project),
+                          PreviewFragment(project: project),
                           AnnotateFragment(),
                           VersionFragment(),
                         ],
