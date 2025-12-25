@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
+import 'package:tmai_pro/src/feature/project/fragment/annotate_fragment.dart';
+import 'package:tmai_pro/src/feature/project/fragment/data_import_fragment.dart';
+import 'package:tmai_pro/src/feature/project/fragment/version_fragment.dart';
+import 'package:tmai_pro/src/feature/project/widget/project_naviation.dart';
 import 'package:tmai_pro/src/services/db_services.dart';
+
+final fragmentIndexProvider = StateProvider<int>((ref) => 0);
 
 class ProjectView extends ConsumerWidget {
   const ProjectView({super.key, required this.projectId});
@@ -21,32 +27,28 @@ class ProjectView extends ConsumerWidget {
         if (snapshot.hasData) {
           final project = snapshot.data!;
           return Scaffold(
-            appBar: AppBar(title: Text(project.title)),
-            body: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Project ID: ${project.id}'),
-                        SizedBox(height: 8),
-                        Text('Title: ${project.title}'),
-                        SizedBox(height: 8),
-                        Text('Created At: ${project.createdAt.toLocal()}'),
-                        // Add more project details here
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.grey[200],
-                      child: Center(child: Text('Additional Details Here')),
-                    ),
-                  ),
-                ],
-              ),
+            body: Row(
+              children: [
+                Expanded(flex: 1, child: ProjectNaviation(project: project)),
+                Container(color: Colors.grey, width: 1),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final index = ref.watch(fragmentIndexProvider);
+
+                    return Expanded(
+                      flex: 4,
+                      child: IndexedStack(
+                        index: index,
+                        children: const [
+                          DataImportFragment(),
+                          AnnotateFragment(),
+                          VersionFragment(),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           );
         } else if (snapshot.hasError) {

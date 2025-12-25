@@ -57,7 +57,7 @@ const ProjectSchema = CollectionSchema(
   getId: _projectGetId,
   getLinks: _projectGetLinks,
   attach: _projectAttach,
-  version: '3.1.0',
+  version: '3.1.0+1',
 );
 
 int _projectEstimateSize(
