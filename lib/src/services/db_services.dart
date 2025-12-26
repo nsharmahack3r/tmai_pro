@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tmai_pro/src/entity_models/dataset/dataset.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/entity_models/trained_model/train.dart';
+import 'package:tmai_pro/src/services/native._services.dart';
 
 final dbServiceProvider = Provider<DbServices>((ref) => DbServices());
 
@@ -23,11 +24,15 @@ class DbServices {
     final directory = await getApplicationDocumentsDirectory();
 
     if (Isar.instanceNames.isEmpty) {
-      return await Isar.open(
+      final instance = await Isar.open(
         [ProjectSchema, DatasetSchema, TrainModelSchema],
         directory: directory.path,
         inspector: true,
       );
+
+      NativeSplash.close();
+
+      return instance;
     }
 
     return Isar.getInstance()!;
@@ -197,6 +202,7 @@ class DbServices {
     await isar.writeTxn(() async {
       for (int p = 1; p <= 6; p++) {
         final project = Project(
+          path: "/data/project_$p",
           title: 'Project $p',
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),

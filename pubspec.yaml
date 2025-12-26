@@ -26,6 +26,7 @@ dependencies:
   # State Management
 
   flutter_riverpod: ^2.6.1
+  file_picker: ^10.3.8
 
 dev_dependencies:
   flutter_test:
