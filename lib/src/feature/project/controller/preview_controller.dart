@@ -15,7 +15,9 @@ final previewControllerProvider =
 class PreviewController extends StateNotifier<PreviewControllerState> {
   PreviewController({required Project project})
     : _project = project,
-      super(PreviewControllerState.initial());
+      super(PreviewControllerState.initial()) {
+    loadImages();
+  }
 
   final Project _project;
 

@@ -3,17 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/project/controller/preview_controller.dart';
+import 'package:tmai_pro/src/feature/project/widget/image_preview_tile.dart';
 
-class PreviewFragment extends StatefulWidget {
+class PreviewFragment extends ConsumerStatefulWidget {
   const PreviewFragment({super.key, required this.project});
 
   final Project project;
 
   @override
-  State<PreviewFragment> createState() => _PreviewFragmentState();
+  ConsumerState<PreviewFragment> createState() => _PreviewFragmentState();
 }
 
-class _PreviewFragmentState extends State<PreviewFragment> {
+class _PreviewFragmentState extends ConsumerState<PreviewFragment> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final previewController = ref.read(
+        previewControllerProvider(widget.project).notifier,
+      );
+      //previewController.loadImages();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -49,18 +61,15 @@ class _PreviewFragmentState extends State<PreviewFragment> {
                   return GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
+                          crossAxisCount: 5,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
-                          childAspectRatio: 1,
+                          childAspectRatio: 0.8,
                         ),
                     itemCount: previewState.imagePaths.length,
                     itemBuilder: (context, index) {
                       final imagePath = previewState.imagePaths[index];
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: Image.file(File(imagePath), fit: BoxFit.cover),
-                      );
+                      return ImagePreviewTile(imageFile: File(imagePath));
                     },
                   );
                 },
