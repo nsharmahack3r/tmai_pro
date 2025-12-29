@@ -4,16 +4,20 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
+import 'package:tmai_pro/src/feature/project/controller/preview_controller.dart';
 
 final importFilesControllerProvider =
     Provider.family<ImportFilesController, Project>((ref, Project project) {
-      return ImportFilesController(project: project);
+      return ImportFilesController(project: project, ref: ref);
     });
 
 class ImportFilesController {
-  ImportFilesController({required Project project}) : _project = project;
+  ImportFilesController({required Project project, required Ref ref})
+    : _project = project,
+      _ref = ref;
 
   final Project _project;
+  final Ref _ref;
   Future<void> importImages() async {
     final destinationPath = "${_project.path}/raw_images";
     final destinationDir = Directory(destinationPath);
@@ -38,6 +42,7 @@ class ImportFilesController {
       final targetFile = File(p.join(destinationDir.path, fileName));
 
       await sourceFile.copy(targetFile.path);
+      _ref.read(previewControllerProvider(_project).notifier).loadImages();
     }
   }
 
