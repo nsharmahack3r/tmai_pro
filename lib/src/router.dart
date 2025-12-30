@@ -1,12 +1,13 @@
 import 'package:go_router/go_router.dart';
+import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/annotate/view/annotate_view.dart';
 import 'package:tmai_pro/src/feature/home/view/home_view.dart';
 import 'package:tmai_pro/src/feature/home/view/new_project.dart';
 import 'package:tmai_pro/src/feature/project/view/project_view.dart';
 
 final router = GoRouter(
-  initialLocation: AnnotateView.routePath,
-  // initialLocation: HomeView.routePath,
+  // initialLocation: AnnotateView.routePath,
+  initialLocation: HomeView.routePath,
   routes: [
     GoRoute(
       path: HomeView.routePath,
@@ -25,7 +26,8 @@ final router = GoRouter(
 
     GoRoute(
       path: AnnotateView.routePath,
-      builder: (context, state) => const AnnotateView(),
+      builder: (context, state) =>
+          AnnotateView(project: state.extra as Project),
     ),
   ],
 );
