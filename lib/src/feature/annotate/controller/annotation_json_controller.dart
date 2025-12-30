@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tmai_pro/src/utils/path_builder.dart';
 
 final annotationJsonControllerProvider =
     Provider.family<AnnotationJsonController, String>((ref, projectPath) {
@@ -11,7 +12,9 @@ final annotationJsonControllerProvider =
 
 class AnnotationJsonController {
   AnnotationJsonController({required String projectPath})
-    : _annotationFilePath = "$projectPath/temp/annotations.json";
+    : _annotationFilePath = PathBuilder.temporaryAnnotationJson(
+        projectPath: projectPath,
+      );
 
   final String _annotationFilePath;
 

@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tmai_pro/src/entity_models/enums/box_handle.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/annotate/controller/annotate_view_controller.dart';
+import 'package:tmai_pro/src/feature/annotate/controller/annotation_preview_controller.dart';
 import 'package:tmai_pro/src/feature/annotate/state/annotation_view_state.dart';
+import 'package:tmai_pro/src/feature/annotate/widget/annotate_view_navigator.dart';
 import 'package:tmai_pro/src/feature/annotate/widget/bounding_box_painter.dart';
 
 class AnnotateView extends ConsumerStatefulWidget {
@@ -36,213 +38,218 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
       annotateViewControllerProvider(widget.project.path).notifier,
     );
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Bounding Box Editor')),
-      body: Row(
-        children: [
-          // -----------------------------------------------------------
-          // LEFT SIDE: Drawing Area (Expanded)
-          // -----------------------------------------------------------
-          Expanded(
-            child: Container(
-              color: Colors.grey[50], // Background for the drawing area
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  const Text(
-                    "Click empty space to draw. Click a box to select & resize.",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 10),
+    return PopScope(
+      onPopInvokedWithResult: (willpop, _) async {
+        ref
+            .read(
+              annotationPreviewControllerProvider(widget.project.path).notifier,
+            )
+            .reload();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Bounding Box Editor')),
+        body: Row(
+          children: [
+            // -----------------------------------------------------------
+            // LEFT SIDE: Drawing Area (Expanded)
+            // -----------------------------------------------------------
+            SizedBox(
+              width: 200,
+              child: ThumbnailViewNavigator(project: widget.project),
+            ),
+            Expanded(
+              child: Container(
+                color: Colors.grey[50], // Background for the drawing area
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Click empty space to draw. Click a box to select & resize.",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 10),
 
-                  // THE CANVAS
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // 1. If no image is loaded, show placeholder
-                        if (state.currentImagePath.isEmpty) {
-                          return const Center(child: Text("No images found"));
-                        }
+                    // THE CANVAS
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // 1. If no image is loaded, show placeholder
+                          if (state.currentImagePath.isEmpty) {
+                            return const Center(child: Text("No images found"));
+                          }
 
-                        // 2. Load the file
-                        final imageFile = File(state.currentImagePath);
+                          // 2. Load the file
+                          final imageFile = File(state.currentImagePath);
 
-                        return Center(
-                          child: Image.file(
-                            imageFile,
-                            fit: BoxFit.contain,
-                            // CHANGED: Back to frameBuilder (loadingBuilder is not supported for Files)
-                            frameBuilder:
-                                (
-                                  context,
-                                  child,
-                                  frame,
-                                  wasSynchronouslyLoaded,
-                                ) {
-                                  // Check if image is ready (frame is not null)
-                                  if (wasSynchronouslyLoaded || frame != null) {
-                                    return Stack(
-                                      children: [
-                                        // Layer A: The actual Image
-                                        child,
+                          return Center(
+                            child: Image.file(
+                              imageFile,
+                              fit: BoxFit.contain,
+                              // CHANGED: Back to frameBuilder (loadingBuilder is not supported for Files)
+                              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                                // Check if image is ready (frame is not null)
+                                if (wasSynchronouslyLoaded || frame != null) {
+                                  return Stack(
+                                    children: [
+                                      // Layer A: The actual Image
+                                      child,
 
-                                        // Layer B: The Transparent Drawing Canvas
-                                        Positioned.fill(
-                                          child: LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              // 1. Wait for controller to load dimensions
-                                              if (state.currentImageSize ==
-                                                  null) {
-                                                return const SizedBox();
-                                              }
+                                      // Layer B: The Transparent Drawing Canvas
+                                      Positioned.fill(
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            // 1. Wait for controller to load dimensions
+                                            if (state.currentImageSize ==
+                                                null) {
+                                              return const SizedBox();
+                                            }
 
-                                              // 2. Calculate Scale
-                                              final double scale =
-                                                  constraints.maxWidth /
-                                                  state.currentImageSize!.width;
+                                            // 2. Calculate Scale
+                                            final double scale =
+                                                constraints.maxWidth /
+                                                state.currentImageSize!.width;
 
-                                              final imageSize = Size(
-                                                constraints.maxWidth,
-                                                constraints.maxHeight,
-                                              );
+                                            final imageSize = Size(
+                                              constraints.maxWidth,
+                                              constraints.maxHeight,
+                                            );
 
-                                              return GestureDetector(
-                                                onPanStart: (details) =>
-                                                    _onPanStart(
-                                                      details,
-                                                      controller,
-                                                      state,
-                                                      scale,
-                                                    ),
-                                                onPanUpdate: (details) =>
-                                                    _onPanUpdate(
-                                                      details,
-                                                      controller,
-                                                      state,
-                                                      imageSize,
-                                                      scale,
-                                                    ),
-                                                onPanEnd: (details) =>
-                                                    _onPanEnd(
-                                                      details,
-                                                      controller,
-                                                      state,
-                                                      scale,
-                                                    ),
-                                                child: CustomPaint(
-                                                  painter: BoundingBoxPainter(
-                                                    boxes: state.boxes,
-                                                    drawingBox:
-                                                        state.drawingBox,
-                                                    selectedIndex:
-                                                        state.selectedIndex,
-                                                    handleSize: _handleSize,
-                                                    scale: scale,
+                                            return GestureDetector(
+                                              onPanStart: (details) =>
+                                                  _onPanStart(
+                                                    details,
+                                                    controller,
+                                                    state,
+                                                    scale,
                                                   ),
+                                              onPanUpdate: (details) =>
+                                                  _onPanUpdate(
+                                                    details,
+                                                    controller,
+                                                    state,
+                                                    imageSize,
+                                                    scale,
+                                                  ),
+                                              onPanEnd: (details) => _onPanEnd(
+                                                details,
+                                                controller,
+                                                state,
+                                                scale,
+                                              ),
+                                              child: CustomPaint(
+                                                painter: BoundingBoxPainter(
+                                                  boxes: state.boxes,
+                                                  drawingBox: state.drawingBox,
+                                                  selectedIndex:
+                                                      state.selectedHandleIndex,
+                                                  handleSize: _handleSize,
+                                                  scale: scale,
                                                 ),
-                                              );
-                                            },
-                                          ),
+                                              ),
+                                            );
+                                          },
                                         ),
-                                      ],
-                                    );
-                                  }
-                                  // Show loader while waiting for the first frame
-                                  return const CircularProgressIndicator();
-                                },
+                                      ),
+                                    ],
+                                  );
+                                }
+                                // Show loader while waiting for the first frame
+                                return const CircularProgressIndicator();
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // -----------------------------------------------------------
+            // RIGHT SIDE: Toolbar (Fixed Width)
+            // -----------------------------------------------------------
+            Container(
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(left: BorderSide(color: Colors.grey.shade300)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Toolbar Header
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    color: Colors.grey.shade100,
+                    child: const Text(
+                      "Tools",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => controller.previousImage(),
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                      IconButton(
+                        onPressed: () => controller.nextImage(),
+                        icon: const Icon(Icons.arrow_forward),
+                      ),
+                    ],
+                  ),
+
+                  // Toolbar Content
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        _buildInfoTile("Total Boxes", "${state.boxes.length}"),
+                        if (state.selectedHandleIndex != null) ...[
+                          const Divider(),
+                          _buildInfoTile(
+                            "Selected",
+                            "Box #${state.selectedHandleIndex}",
                           ),
-                        );
-                      },
+                          const SizedBox(height: 10),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              controller.removeSelectedBox();
+                            },
+                            icon: const Icon(Icons.delete, size: 16),
+                            label: const Text("Delete Box"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.shade50,
+                              foregroundColor: Colors.red,
+                            ),
+                          ),
+                        ] else ...[
+                          const SizedBox(height: 20),
+                          const Text(
+                            "No box selected",
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  // Toolbar Footer (Actions)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: OutlinedButton(
+                      onPressed: () => controller.clearAllBoxes(),
+                      child: const Text("Clear All"),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-
-          // -----------------------------------------------------------
-          // RIGHT SIDE: Toolbar (Fixed Width)
-          // -----------------------------------------------------------
-          Container(
-            width: 200,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(left: BorderSide(color: Colors.grey.shade300)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Toolbar Header
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.grey.shade100,
-                  child: const Text(
-                    "Tools",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => controller.previousImage(),
-                      icon: const Icon(Icons.arrow_back),
-                    ),
-                    IconButton(
-                      onPressed: () => controller.nextImage(),
-                      icon: const Icon(Icons.arrow_forward),
-                    ),
-                  ],
-                ),
-
-                // Toolbar Content
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      _buildInfoTile("Total Boxes", "${state.boxes.length}"),
-                      if (state.selectedIndex != null) ...[
-                        const Divider(),
-                        _buildInfoTile(
-                          "Selected",
-                          "Box #${state.selectedIndex}",
-                        ),
-                        const SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            controller.removeSelectedBox();
-                          },
-                          icon: const Icon(Icons.delete, size: 16),
-                          label: const Text("Delete Box"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade50,
-                            foregroundColor: Colors.red,
-                          ),
-                        ),
-                      ] else ...[
-                        const SizedBox(height: 20),
-                        const Text(
-                          "No box selected",
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-
-                // Toolbar Footer (Actions)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: OutlinedButton(
-                    onPressed: () => controller.clearAllBoxes(),
-                    child: const Text("Clear All"),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -272,10 +279,10 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
     // Convert Screen Pixel -> Image Pixel
     final pos = details.localPosition / scale;
 
-    if (state.selectedIndex != null) {
+    if (state.selectedHandleIndex != null) {
       // Check handles using the unscaled stored box vs unscaled pos
       final handle = _getHandleAtPoint(
-        state.boxes[state.selectedIndex!],
+        state.boxes[state.selectedHandleIndex!],
         pos,
         scale,
       );
@@ -288,7 +295,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
     bool foundBox = false;
     for (int i = state.boxes.length - 1; i >= 0; i--) {
       if (state.boxes[i].contains(pos)) {
-        controller.setSelectedIndex(i);
+        controller.setSelectedHandleIndex(i);
         controller.setBoxHandle(BoxHandle.none);
         foundBox = true;
         break;
@@ -296,7 +303,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
     }
 
     if (!foundBox) {
-      controller.setSelectedIndex(null);
+      controller.setSelectedHandleIndex(null);
       controller.setStartPoint(pos);
       controller.setDrawingBox(Rect.fromPoints(pos, pos));
     }
@@ -316,8 +323,9 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
     // 2. Convert Clamped Screen Pixel -> Image Pixel
     final clampedPos = Offset(dx, dy) / scale;
 
-    if (state.selectedIndex != null && state.activeHandle != BoxHandle.none) {
-      final currentRect = state.boxes[state.selectedIndex!];
+    if (state.selectedHandleIndex != null &&
+        state.activeHandle != BoxHandle.none) {
+      final currentRect = state.boxes[state.selectedHandleIndex!];
       Rect newRect = currentRect;
 
       switch (state.activeHandle) {
@@ -336,7 +344,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
         case BoxHandle.none:
           break;
       }
-      controller.updateBox(state.selectedIndex!, newRect);
+      controller.updateBox(state.selectedHandleIndex!, newRect);
     } else if (state.drawingBox != null && state.startPoint != null) {
       // Use the clampedPos for the end point of the drawing box
       controller.setDrawingBox(Rect.fromPoints(state.startPoint!, clampedPos));
@@ -362,7 +370,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
         controller.addBox(state.drawingBox!);
         // Auto-select the newly created box
         // Note: state.boxes here is the OLD list. The new index will be length of current list.
-        controller.setSelectedIndex(state.boxes.length);
+        controller.setSelectedHandleIndex(state.boxes.length);
       }
 
       controller.setDrawingBox(null);

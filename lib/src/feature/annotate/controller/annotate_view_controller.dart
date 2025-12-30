@@ -6,6 +6,7 @@ import 'package:tmai_pro/src/feature/annotate/controller/annotation_json_control
 import 'package:tmai_pro/src/feature/annotate/state/annotation_view_state.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:tmai_pro/src/utils/path_builder.dart';
 
 final annotateViewControllerProvider =
     StateNotifierProvider.family<
@@ -61,11 +62,15 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
   }
 
   // UPDATED: Using the new copyWith flags for null safety
-  void setSelectedIndex(int? index) {
+  void setSelectedHandleIndex(int? index) {
     state = state.copyWith(
-      selectedIndex: index,
+      selectedHandleIndex: index,
       setSelectedIndexToNull: index == null,
     );
+  }
+
+  void setSelectedImageIndex(int index) {
+    _switchImage(index);
   }
 
   void setStartPoint(Offset? point) {
@@ -86,7 +91,9 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
 
   Future<void> loadImages() async {
     const supportedExtensions = {'.jpg', '.jpeg', '.png'};
-    final rawImagesDir = Directory(p.join(_projectPath, 'raw_images'));
+    final rawImagesDir = Directory(
+      PathBuilder.rawImagesDir(projectPath: _projectPath),
+    );
 
     if (!rawImagesDir.existsSync()) return;
 
@@ -154,7 +161,7 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
       selectedImageIndex: newIndex,
       boxes: newBoxes,
       currentImageSize: newSize, // <--- Update Size
-      selectedIndex: null,
+      selectedHandleIndex: null,
       setSelectedIndexToNull: true,
       activeHandle: BoxHandle.none,
     );
@@ -162,16 +169,16 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
 
   void removeSelectedBox() {
     // Safety Check: Ensure we actually have a selection
-    if (state.selectedIndex != null) {
+    if (state.selectedHandleIndex != null) {
       final currentBoxes = List<Rect>.from(state.boxes);
 
       // Safety Check: Ensure index is valid
-      if (state.selectedIndex! < currentBoxes.length) {
-        currentBoxes.removeAt(state.selectedIndex!);
+      if (state.selectedHandleIndex! < currentBoxes.length) {
+        currentBoxes.removeAt(state.selectedHandleIndex!);
 
         state = state.copyWith(
           boxes: currentBoxes,
-          selectedIndex: null, // Deselect immediately
+          selectedHandleIndex: null, // Deselect immediately
           setSelectedIndexToNull: true,
         );
       }
@@ -181,7 +188,7 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
   void clearAllBoxes() {
     state = state.copyWith(
       boxes: [],
-      selectedIndex: null,
+      selectedHandleIndex: null,
       setSelectedIndexToNull: true,
     );
   }

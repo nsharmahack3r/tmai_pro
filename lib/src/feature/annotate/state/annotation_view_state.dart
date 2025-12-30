@@ -8,7 +8,7 @@ class AnnotationViewState {
   final int selectedImageIndex;
 
   final List<Rect> boxes;
-  final int? selectedIndex;
+  final int? selectedHandleIndex;
   final BoxHandle activeHandle;
 
   // Temporary drawing state
@@ -20,7 +20,7 @@ class AnnotationViewState {
     required this.images,
     required this.selectedImageIndex,
     required this.boxes,
-    this.selectedIndex,
+    this.selectedHandleIndex,
     this.activeHandle = BoxHandle.none,
     this.drawingBox,
     this.startPoint,
@@ -43,7 +43,7 @@ class AnnotationViewState {
       images: [],
       selectedImageIndex: 0, // Default to 0
       boxes: [],
-      selectedIndex: null,
+      selectedHandleIndex: null,
       activeHandle: BoxHandle.none,
       drawingBox: null,
       startPoint: null,
@@ -55,7 +55,7 @@ class AnnotationViewState {
     List<String>? images,
     int? selectedImageIndex, // CHANGED
     List<Rect>? boxes,
-    int? selectedIndex,
+    int? selectedHandleIndex,
     BoxHandle? activeHandle,
     Rect? drawingBox,
     Offset? startPoint,
@@ -70,9 +70,9 @@ class AnnotationViewState {
       selectedImageIndex: selectedImageIndex ?? this.selectedImageIndex,
       boxes: boxes ?? this.boxes,
       // If force null is true, use null. Else use new value. If new value is null, use old value.
-      selectedIndex: setSelectedIndexToNull
+      selectedHandleIndex: setSelectedIndexToNull
           ? null
-          : (selectedIndex ?? this.selectedIndex),
+          : (selectedHandleIndex ?? this.selectedHandleIndex),
       activeHandle: activeHandle ?? this.activeHandle,
       drawingBox: setDrawingBoxToNull ? null : (drawingBox ?? this.drawingBox),
       startPoint: setStartPointToNull ? null : (startPoint ?? this.startPoint),
