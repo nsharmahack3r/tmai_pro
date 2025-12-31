@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
 import 'package:tmai_pro/src/feature/project/controller/preview_controller.dart';
+import 'package:tmai_pro/src/utils/path_builder.dart';
 
 final importFilesControllerProvider =
     Provider.family<ImportFilesController, Project>((ref, Project project) {
@@ -18,8 +19,11 @@ class ImportFilesController {
 
   final Project _project;
   final Ref _ref;
+
   Future<void> importImages() async {
-    final destinationPath = "${_project.path}/raw_images";
+    final destinationPath = PathBuilder.rawImagesDir(
+      projectPath: _project.path,
+    );
     final destinationDir = Directory(destinationPath);
 
     if (!destinationDir.existsSync()) {
@@ -47,7 +51,9 @@ class ImportFilesController {
   }
 
   Future<void> importImagesFromFolder() async {
-    final destinationPath = "${_project.path}/raw_images";
+    final destinationPath = PathBuilder.rawImagesDir(
+      projectPath: _project.path,
+    );
     final destinationDir = Directory(destinationPath);
 
     if (!destinationDir.existsSync()) {
