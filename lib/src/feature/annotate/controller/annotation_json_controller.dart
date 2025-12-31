@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tmai_pro/src/feature/annotate/state/annotation_view_state.dart';
 import 'package:tmai_pro/src/utils/path_builder.dart';
 
 final annotationJsonControllerProvider =
@@ -36,7 +37,7 @@ class AnnotationJsonController {
   /// SAVE ANNOTATIONS FOR A SINGLE IMAGE
   /// (Overwrites boxes if imagePath already exists)
   /// ------------------------------------------------------------
-  void saveAnnotations({required String imagePath, required List<Rect> boxes}) {
+  void saveAnnotations({required String imagePath, required List<BBox> boxes}) {
     final file = File(_annotationFilePath);
     _createAnnotationFileIfNotExists();
 
@@ -50,12 +51,13 @@ class AnnotationJsonController {
     // Add updated annotation
     annotations.add({
       "imagePath": imagePath,
-      "boxes": boxes.map((rect) {
+      "boxes": boxes.map((b) {
         return {
-          "x": rect.left,
-          "y": rect.top,
-          "width": rect.width,
-          "height": rect.height,
+          "x": b.rect.left,
+          "y": b.rect.top,
+          "width": b.rect.width,
+          "height": b.rect.height,
+          "className": b.className,
         };
       }).toList(),
     });
@@ -68,7 +70,7 @@ class AnnotationJsonController {
   /// ------------------------------------------------------------
   /// LOAD ANNOTATIONS FOR A SINGLE IMAGE
   /// ------------------------------------------------------------
-  Future<List<Rect>> loadAnnotations({required String imagePath}) async {
+  Future<List<BBox>> loadAnnotations({required String imagePath}) async {
     final file = File(_annotationFilePath);
 
     if (!await file.exists()) return [];
@@ -86,12 +88,15 @@ class AnnotationJsonController {
 
     final List boxes = imageEntry["boxes"] ?? [];
 
-    return boxes.map<Rect>((b) {
-      return Rect.fromLTWH(
-        (b["x"] as num).toDouble(),
-        (b["y"] as num).toDouble(),
-        (b["width"] as num).toDouble(),
-        (b["height"] as num).toDouble(),
+    return boxes.map<BBox>((b) {
+      return BBox(
+        rect: Rect.fromLTWH(
+          (b["x"] as num).toDouble(),
+          (b["y"] as num).toDouble(),
+          (b["width"] as num).toDouble(),
+          (b["height"] as num).toDouble(),
+        ),
+        className: b["className"] ?? "default",
       );
     }).toList();
   }

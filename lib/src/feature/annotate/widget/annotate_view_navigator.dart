@@ -13,7 +13,7 @@ class ThumbnailViewNavigator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(annotateViewControllerProvider(project.path));
+    final state = ref.watch(annotateViewControllerProvider(project));
     final imageFiles = state.images;
     return ListView.builder(
       itemCount: imageFiles.length,
@@ -23,7 +23,7 @@ class ThumbnailViewNavigator extends ConsumerWidget {
           imagePath: imageFile,
           onTap: () {
             ref
-                .read(annotateViewControllerProvider(project.path).notifier)
+                .read(annotateViewControllerProvider(project).notifier)
                 .setSelectedImageIndex(index);
           },
           annotations: {},

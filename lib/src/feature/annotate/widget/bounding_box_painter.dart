@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:tmai_pro/src/feature/annotate/state/annotation_view_state.dart';
+import 'package:tmai_pro/src/utils/color_builder.dart';
 
 class BoundingBoxPainter extends CustomPainter {
-  final List<Rect> boxes;
-  final Rect? drawingBox; // The box currently being created
-  final int? selectedIndex; // Index of the selected box (for green styling)
+  final List<BBox> boxes;
+  final Rect? drawingBox;
+  final int? selectedIndex;
   final double handleSize;
   final double scale;
 
@@ -24,12 +26,20 @@ class BoundingBoxPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     final Paint selectedPaint = Paint()
-      ..color = Colors.greenAccent
+      ..color = selectedIndex == null
+          ? Colors.green
+          : ColorBuilder.getRandomColorFromClassName(
+              boxes[selectedIndex!].className,
+            )
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5;
 
     final Paint handlePaint = Paint()
-      ..color = Colors.green
+      ..color = selectedIndex == null
+          ? Colors.green
+          : ColorBuilder.getRandomColorFromClassName(
+              boxes[selectedIndex!].className,
+            )
       ..style = PaintingStyle.fill;
 
     // HELPER: Transform Image Coordinates -> Screen Coordinates
@@ -45,7 +55,7 @@ class BoundingBoxPainter extends CustomPainter {
     // 2. Draw existing boxes
     for (int i = 0; i < boxes.length; i++) {
       // Scale the stored box to match the current screen size
-      final rect = scaleRect(boxes[i]);
+      final rect = scaleRect(boxes[i].rect);
       final bool isSelected = (i == selectedIndex);
 
       // Draw the Rect
@@ -55,7 +65,15 @@ class BoundingBoxPainter extends CustomPainter {
       canvas.drawRect(
         rect,
         Paint()
-          ..color = (isSelected ? Colors.green : Colors.blue).withOpacity(0.1),
+          ..color =
+              (isSelected
+                      ? (selectedIndex == null
+                            ? Colors.green
+                            : ColorBuilder.getRandomColorFromClassName(
+                                boxes[selectedIndex!].className,
+                              ))
+                      : Colors.blue)
+                  .withOpacity(0.1),
       );
 
       // Draw Resize Handles (if selected)

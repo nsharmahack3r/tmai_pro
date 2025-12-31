@@ -7,7 +7,7 @@ class AnnotationViewState {
   // CHANGED: Track index instead of path string
   final int selectedImageIndex;
 
-  final List<Rect> boxes;
+  final List<BBox> boxes;
   final int? selectedHandleIndex;
   final BoxHandle activeHandle;
 
@@ -15,6 +15,7 @@ class AnnotationViewState {
   final Rect? drawingBox;
   final Offset? startPoint;
   final Size? currentImageSize;
+  final List<String> classes;
 
   AnnotationViewState({
     required this.images,
@@ -25,6 +26,7 @@ class AnnotationViewState {
     this.drawingBox,
     this.startPoint,
     this.currentImageSize,
+    required this.classes,
   });
 
   // HELPER GETTER: safely get the current path
@@ -47,6 +49,8 @@ class AnnotationViewState {
       activeHandle: BoxHandle.none,
       drawingBox: null,
       startPoint: null,
+      currentImageSize: null,
+      classes: ["default"],
     );
   }
 
@@ -54,7 +58,7 @@ class AnnotationViewState {
   AnnotationViewState copyWith({
     List<String>? images,
     int? selectedImageIndex, // CHANGED
-    List<Rect>? boxes,
+    List<BBox>? boxes,
     int? selectedHandleIndex,
     BoxHandle? activeHandle,
     Rect? drawingBox,
@@ -64,6 +68,7 @@ class AnnotationViewState {
     bool setDrawingBoxToNull = false,
     bool setStartPointToNull = false,
     Size? currentImageSize,
+    List<String>? classes,
   }) {
     return AnnotationViewState(
       images: images ?? this.images,
@@ -77,6 +82,16 @@ class AnnotationViewState {
       drawingBox: setDrawingBoxToNull ? null : (drawingBox ?? this.drawingBox),
       startPoint: setStartPointToNull ? null : (startPoint ?? this.startPoint),
       currentImageSize: currentImageSize ?? this.currentImageSize,
+      classes: classes ?? this.classes,
     );
   }
+}
+
+class BBox {
+  final Rect rect;
+  final String className;
+  BBox({required this.rect, this.className = 'default'});
+
+  BBox copyWith({Rect? rect, String? className}) =>
+      BBox(rect: rect ?? this.rect, className: className ?? this.className);
 }

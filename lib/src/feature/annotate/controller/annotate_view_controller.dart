@@ -1,40 +1,50 @@
 import 'dart:ui';
 import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tmai_pro/src/entity_models/enums/box_handle.dart';
+import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/annotate/controller/annotation_json_controller.dart';
 import 'package:tmai_pro/src/feature/annotate/state/annotation_view_state.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:tmai_pro/src/services/db_services.dart';
 import 'package:tmai_pro/src/utils/path_builder.dart';
 
 final annotateViewControllerProvider =
     StateNotifierProvider.family<
       AnnotateViewController,
       AnnotationViewState,
-      String
-    >((ref, projectPath) {
+      Project
+    >((ref, project) {
       final jsonController = ref.read(
-        annotationJsonControllerProvider(projectPath),
+        annotationJsonControllerProvider(project.path),
       );
       return AnnotateViewController(
         jsonController: jsonController,
-        projectPath: projectPath,
+        project: project,
+        ref: ref,
       );
     });
 
 class AnnotateViewController extends StateNotifier<AnnotationViewState> {
   AnnotateViewController({
     required AnnotationJsonController jsonController,
-    required String projectPath,
+    required Project project,
+    required Ref ref,
   }) : _jsonController = jsonController,
-       _projectPath = projectPath,
+       _project = project,
+       _ref = ref,
        super(AnnotationViewState.initial()) {
     loadImages();
+    if (project.classes.isNotEmpty) {
+      state = state.copyWith(classes: project.classes);
+    }
   }
 
   final AnnotationJsonController _jsonController;
-  final String _projectPath;
+  final Project _project;
+  final Ref _ref;
 
   Future<Size> _getImageSize(String path) async {
     final file = File(path);
@@ -52,12 +62,17 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
   }
 
   void addBox(Rect box) {
-    state = state.copyWith(boxes: [...state.boxes, box]);
+    state = state.copyWith(
+      boxes: [
+        ...state.boxes,
+        BBox(rect: box),
+      ],
+    );
   }
 
-  void updateBox(int index, Rect newRect) {
-    final updatedBoxes = List<Rect>.from(state.boxes);
-    updatedBoxes[index] = newRect;
+  void updateBox(int index, BBox newBox) {
+    final updatedBoxes = List<BBox>.from(state.boxes);
+    updatedBoxes[index] = newBox;
     state = state.copyWith(boxes: updatedBoxes);
   }
 
@@ -85,14 +100,14 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
   }
 
   void removeBoxAt(int index) {
-    final updatedBoxes = List<Rect>.from(state.boxes)..removeAt(index);
+    final updatedBoxes = List<BBox>.from(state.boxes)..removeAt(index);
     state = state.copyWith(boxes: updatedBoxes);
   }
 
   Future<void> loadImages() async {
     const supportedExtensions = {'.jpg', '.jpeg', '.png'};
     final rawImagesDir = Directory(
-      PathBuilder.rawImagesDir(projectPath: _projectPath),
+      PathBuilder.rawImagesDir(projectPath: _project.path),
     );
 
     if (!rawImagesDir.existsSync()) return;
@@ -170,7 +185,7 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
   void removeSelectedBox() {
     // Safety Check: Ensure we actually have a selection
     if (state.selectedHandleIndex != null) {
-      final currentBoxes = List<Rect>.from(state.boxes);
+      final currentBoxes = List<BBox>.from(state.boxes);
 
       // Safety Check: Ensure index is valid
       if (state.selectedHandleIndex! < currentBoxes.length) {
@@ -198,5 +213,16 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
     if (state.currentImageSize != size) {
       state = state.copyWith(currentImageSize: size);
     }
+  }
+
+  void addNewClass(String newClass, Project project) {
+    state = state.copyWith(classes: [...state.classes, newClass]);
+
+    final newProject = project.copyWith(classes: state.classes);
+    _ref.read(dbServiceProvider).updateProject(newProject);
+  }
+
+  void removeClass(String classToRemove) {
+    state = state.copyWith(classes: state.classes..remove(classToRemove));
   }
 }

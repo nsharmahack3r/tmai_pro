@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/annotate/controller/annotation_preview_controller.dart';
 import 'package:tmai_pro/src/feature/annotate/view/annotate_view.dart';
+import 'package:tmai_pro/src/feature/annotate/widget/annotate_summary.dart';
 import 'package:tmai_pro/src/feature/project/widget/annotated_image_preview.dart';
 import 'package:tmai_pro/src/feature/project/widget/annotation_preview_list_tile.dart';
 
@@ -137,6 +138,14 @@ class _AnnotateFragmentState extends ConsumerState<AnnotateFragment> {
                                 },
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            AnnotationSummary(project: widget.project),
+                            SizedBox(height: 16),
                             state.currentIndex < 0
                                 ? const SizedBox.shrink()
                                 : Flexible(

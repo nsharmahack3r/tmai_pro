@@ -11,6 +11,7 @@ class Project {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String path;
+  final List<String> classes;
 
   final datasets = IsarLinks<Dataset>();
   final models = IsarLinks<TrainModel>();
@@ -21,6 +22,7 @@ class Project {
     required this.createdAt,
     required this.updatedAt,
     required this.path,
+    this.classes = const [],
   });
 
   Project copyWith({
@@ -28,6 +30,7 @@ class Project {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? path,
+    List<String>? classes,
   }) {
     return Project(
       id: id,
@@ -35,6 +38,7 @@ class Project {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       path: path ?? this.path,
+      classes: classes ?? this.classes,
     );
   }
 }

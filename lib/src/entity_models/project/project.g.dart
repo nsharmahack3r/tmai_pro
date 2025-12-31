@@ -17,23 +17,28 @@ const ProjectSchema = CollectionSchema(
   name: r'Project',
   id: 3302999628838485849,
   properties: {
-    r'createdAt': PropertySchema(
+    r'classes': PropertySchema(
       id: 0,
+      name: r'classes',
+      type: IsarType.stringList,
+    ),
+    r'createdAt': PropertySchema(
+      id: 1,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
     r'path': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'path',
       type: IsarType.string,
     ),
     r'title': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'title',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -71,6 +76,13 @@ int _projectEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.classes.length * 3;
+  {
+    for (var i = 0; i < object.classes.length; i++) {
+      final value = object.classes[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.path.length * 3;
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
@@ -82,10 +94,11 @@ void _projectSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTime(offsets[0], object.createdAt);
-  writer.writeString(offsets[1], object.path);
-  writer.writeString(offsets[2], object.title);
-  writer.writeDateTime(offsets[3], object.updatedAt);
+  writer.writeStringList(offsets[0], object.classes);
+  writer.writeDateTime(offsets[1], object.createdAt);
+  writer.writeString(offsets[2], object.path);
+  writer.writeString(offsets[3], object.title);
+  writer.writeDateTime(offsets[4], object.updatedAt);
 }
 
 Project _projectDeserialize(
@@ -95,11 +108,12 @@ Project _projectDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Project(
-    createdAt: reader.readDateTime(offsets[0]),
+    classes: reader.readStringList(offsets[0]) ?? const [],
+    createdAt: reader.readDateTime(offsets[1]),
     id: id,
-    path: reader.readString(offsets[1]),
-    title: reader.readString(offsets[2]),
-    updatedAt: reader.readDateTime(offsets[3]),
+    path: reader.readString(offsets[2]),
+    title: reader.readString(offsets[3]),
+    updatedAt: reader.readDateTime(offsets[4]),
   );
   return object;
 }
@@ -112,12 +126,14 @@ P _projectDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readStringList(offset) ?? const []) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
+      return (reader.readString(offset)) as P;
+    case 4:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -214,6 +230,225 @@ extension ProjectQueryWhere on QueryBuilder<Project, Project, QWhereClause> {
 
 extension ProjectQueryFilter
     on QueryBuilder<Project, Project, QFilterCondition> {
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'classes',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition>
+      classesElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'classes',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'classes',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'classes',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition>
+      classesElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'classes',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'classes',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesElementContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'classes',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesElementMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'classes',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition>
+      classesElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'classes',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition>
+      classesElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'classes',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'classes',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'classes',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'classes',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'classes',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition>
+      classesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'classes',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Project, Project, QAfterFilterCondition> classesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'classes',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
   QueryBuilder<Project, Project, QAfterFilterCondition> createdAtEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -867,6 +1102,12 @@ extension ProjectQuerySortThenBy
 
 extension ProjectQueryWhereDistinct
     on QueryBuilder<Project, Project, QDistinct> {
+  QueryBuilder<Project, Project, QDistinct> distinctByClasses() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'classes');
+    });
+  }
+
   QueryBuilder<Project, Project, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
@@ -899,6 +1140,12 @@ extension ProjectQueryProperty
   QueryBuilder<Project, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Project, List<String>, QQueryOperations> classesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'classes');
     });
   }
 

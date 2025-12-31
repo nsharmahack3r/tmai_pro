@@ -10,6 +10,7 @@ import 'package:tmai_pro/src/feature/annotate/controller/annotate_view_controlle
 import 'package:tmai_pro/src/feature/annotate/controller/annotation_preview_controller.dart';
 import 'package:tmai_pro/src/feature/annotate/state/annotation_view_state.dart';
 import 'package:tmai_pro/src/feature/annotate/widget/annotate_view_navigator.dart';
+import 'package:tmai_pro/src/feature/annotate/widget/annotation_tool_widget.dart';
 import 'package:tmai_pro/src/feature/annotate/widget/bounding_box_painter.dart';
 
 class AnnotateView extends ConsumerStatefulWidget {
@@ -29,13 +30,11 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
   @override
   Widget build(BuildContext context) {
     // 1. WATCH the state to rebuild when boxes change
-    final state = ref.watch(
-      annotateViewControllerProvider(widget.project.path),
-    );
+    final state = ref.watch(annotateViewControllerProvider(widget.project));
 
     // 2. READ the controller to call methods (prevent unnecessary rebuilds)
     final controller = ref.read(
-      annotateViewControllerProvider(widget.project.path).notifier,
+      annotateViewControllerProvider(widget.project).notifier,
     );
 
     return PopScope(
@@ -165,110 +164,12 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
                 ),
               ),
             ),
-
-            // -----------------------------------------------------------
-            // RIGHT SIDE: Toolbar (Fixed Width)
-            // -----------------------------------------------------------
-            Container(
-              width: 200,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(left: BorderSide(color: Colors.grey.shade300)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Toolbar Header
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    color: Colors.grey.shade100,
-                    child: const Text(
-                      "Tools",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => controller.previousImage(),
-                        icon: const Icon(Icons.arrow_back),
-                      ),
-                      IconButton(
-                        onPressed: () => controller.nextImage(),
-                        icon: const Icon(Icons.arrow_forward),
-                      ),
-                    ],
-                  ),
-
-                  // Toolbar Content
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        _buildInfoTile("Total Boxes", "${state.boxes.length}"),
-                        if (state.selectedHandleIndex != null) ...[
-                          const Divider(),
-                          _buildInfoTile(
-                            "Selected",
-                            "Box #${state.selectedHandleIndex}",
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              controller.removeSelectedBox();
-                            },
-                            icon: const Icon(Icons.delete, size: 16),
-                            label: const Text("Delete Box"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red.shade50,
-                              foregroundColor: Colors.red,
-                            ),
-                          ),
-                        ] else ...[
-                          const SizedBox(height: 20),
-                          const Text(
-                            "No box selected",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  // Toolbar Footer (Actions)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: OutlinedButton(
-                      onPressed: () => controller.clearAllBoxes(),
-                      child: const Text("Clear All"),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            AnnotationToolWidget(project: widget.project),
           ],
         ),
       ),
     );
   }
-
-  // Helper widget for toolbar info
-  Widget _buildInfoTile(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  // --- INTERACTION LOGIC ---
 
   void _onPanStart(
     DragStartDetails details,
@@ -282,7 +183,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
     if (state.selectedHandleIndex != null) {
       // Check handles using the unscaled stored box vs unscaled pos
       final handle = _getHandleAtPoint(
-        state.boxes[state.selectedHandleIndex!],
+        state.boxes[state.selectedHandleIndex!].rect,
         pos,
         scale,
       );
@@ -294,7 +195,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
 
     bool foundBox = false;
     for (int i = state.boxes.length - 1; i >= 0; i--) {
-      if (state.boxes[i].contains(pos)) {
+      if (state.boxes[i].rect.contains(pos)) {
         controller.setSelectedHandleIndex(i);
         controller.setBoxHandle(BoxHandle.none);
         foundBox = true;
@@ -325,7 +226,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
 
     if (state.selectedHandleIndex != null &&
         state.activeHandle != BoxHandle.none) {
-      final currentRect = state.boxes[state.selectedHandleIndex!];
+      final currentRect = state.boxes[state.selectedHandleIndex!].rect;
       Rect newRect = currentRect;
 
       switch (state.activeHandle) {
@@ -344,7 +245,10 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
         case BoxHandle.none:
           break;
       }
-      controller.updateBox(state.selectedHandleIndex!, newRect);
+      controller.updateBox(
+        state.selectedHandleIndex!,
+        state.boxes[state.selectedHandleIndex!].copyWith(rect: newRect),
+      );
     } else if (state.drawingBox != null && state.startPoint != null) {
       // Use the clampedPos for the end point of the drawing box
       controller.setDrawingBox(Rect.fromPoints(state.startPoint!, clampedPos));
