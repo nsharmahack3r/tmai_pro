@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
+import 'package:tmai_pro/src/feature/annotate/controller/annotation_preview_controller.dart';
 import 'package:tmai_pro/src/feature/project/controller/preview_controller.dart';
+import 'package:tmai_pro/src/feature/project/view/project_view.dart';
 import 'package:tmai_pro/src/utils/path_builder.dart';
 
 final importFilesControllerProvider =
@@ -46,8 +48,13 @@ class ImportFilesController {
       final targetFile = File(p.join(destinationDir.path, fileName));
 
       await sourceFile.copy(targetFile.path);
-      _ref.read(previewControllerProvider(_project).notifier).loadImages();
     }
+
+    _ref.read(previewControllerProvider(_project).notifier).loadImages();
+    _ref
+        .read(annotationPreviewControllerProvider(_project.path).notifier)
+        .loadImagePaths();
+    _ref.read(fragmentIndexProvider.notifier).update((state) => 1);
   }
 
   Future<void> importImagesFromFolder() async {

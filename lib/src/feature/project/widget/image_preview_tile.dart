@@ -13,7 +13,7 @@ class ImagePreviewTile extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(6),
-          child: Image.file(imageFile),
+          child: Image.file(imageFile, fit: BoxFit.contain, height: 200),
         ),
         Container(
           padding: EdgeInsets.only(top: 4),

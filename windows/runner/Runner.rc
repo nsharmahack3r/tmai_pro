@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "tmai_pro" "\0"
+            VALUE "CompanyName", "Dartbucket" "\0"
+            VALUE "FileDescription", "Tmai Pro" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "tmai_pro" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "tmai_pro.exe" "\0"
-            VALUE "ProductName", "tmai_pro" "\0"
+            VALUE "InternalName", "Tmai Pro" "\0"
+            VALUE "LegalCopyright", "Copyright © 2026" "\0"
+            VALUE "OriginalFilename", "tmai.exe" "\0"
+            VALUE "ProductName", "Tmai Pro" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
