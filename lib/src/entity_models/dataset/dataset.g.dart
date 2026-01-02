@@ -42,10 +42,25 @@ const DatasetSchema = CollectionSchema(
       name: r'tags',
       type: IsarType.stringList,
     ),
-    r'updatedAt': PropertySchema(
+    r'testSplit': PropertySchema(
       id: 5,
+      name: r'testSplit',
+      type: IsarType.double,
+    ),
+    r'trainSplit': PropertySchema(
+      id: 6,
+      name: r'trainSplit',
+      type: IsarType.double,
+    ),
+    r'updatedAt': PropertySchema(
+      id: 7,
       name: r'updatedAt',
       type: IsarType.dateTime,
+    ),
+    r'valSplit': PropertySchema(
+      id: 8,
+      name: r'valSplit',
+      type: IsarType.double,
     )
   },
   estimateSize: _datasetEstimateSize,
@@ -115,7 +130,10 @@ void _datasetSerialize(
   writer.writeString(offsets[2], object.name);
   writer.writeString(offsets[3], object.path);
   writer.writeStringList(offsets[4], object.tags);
-  writer.writeDateTime(offsets[5], object.updatedAt);
+  writer.writeDouble(offsets[5], object.testSplit);
+  writer.writeDouble(offsets[6], object.trainSplit);
+  writer.writeDateTime(offsets[7], object.updatedAt);
+  writer.writeDouble(offsets[8], object.valSplit);
 }
 
 Dataset _datasetDeserialize(
@@ -131,7 +149,10 @@ Dataset _datasetDeserialize(
     name: reader.readString(offsets[2]),
     path: reader.readString(offsets[3]),
     tags: reader.readStringList(offsets[4]),
-    updatedAt: reader.readDateTime(offsets[5]),
+    testSplit: reader.readDoubleOrNull(offsets[5]) ?? 0.1,
+    trainSplit: reader.readDoubleOrNull(offsets[6]) ?? 0.8,
+    updatedAt: reader.readDateTime(offsets[7]),
+    valSplit: reader.readDoubleOrNull(offsets[8]) ?? 0.1,
   );
   return object;
 }
@@ -154,7 +175,13 @@ P _datasetDeserializeProp<P>(
     case 4:
       return (reader.readStringList(offset)) as P;
     case 5:
+      return (reader.readDoubleOrNull(offset) ?? 0.1) as P;
+    case 6:
+      return (reader.readDoubleOrNull(offset) ?? 0.8) as P;
+    case 7:
       return (reader.readDateTime(offset)) as P;
+    case 8:
+      return (reader.readDoubleOrNull(offset) ?? 0.1) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1080,6 +1107,130 @@ extension DatasetQueryFilter
     });
   }
 
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> testSplitEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'testSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> testSplitGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'testSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> testSplitLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'testSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> testSplitBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'testSplit',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> trainSplitEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'trainSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> trainSplitGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'trainSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> trainSplitLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'trainSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> trainSplitBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'trainSplit',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<Dataset, Dataset, QAfterFilterCondition> updatedAtEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -1129,6 +1280,68 @@ extension DatasetQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> valSplitEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'valSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> valSplitGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'valSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> valSplitLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'valSplit',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterFilterCondition> valSplitBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'valSplit',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -1190,6 +1403,30 @@ extension DatasetQuerySortBy on QueryBuilder<Dataset, Dataset, QSortBy> {
     });
   }
 
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByTestSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'testSplit', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByTestSplitDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'testSplit', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByTrainSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trainSplit', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByTrainSplitDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trainSplit', Sort.desc);
+    });
+  }
+
   QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.asc);
@@ -1199,6 +1436,18 @@ extension DatasetQuerySortBy on QueryBuilder<Dataset, Dataset, QSortBy> {
   QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByValSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'valSplit', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> sortByValSplitDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'valSplit', Sort.desc);
     });
   }
 }
@@ -1253,6 +1502,30 @@ extension DatasetQuerySortThenBy
     });
   }
 
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByTestSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'testSplit', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByTestSplitDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'testSplit', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByTrainSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trainSplit', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByTrainSplitDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trainSplit', Sort.desc);
+    });
+  }
+
   QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.asc);
@@ -1262,6 +1535,18 @@ extension DatasetQuerySortThenBy
   QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByValSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'valSplit', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QAfterSortBy> thenByValSplitDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'valSplit', Sort.desc);
     });
   }
 }
@@ -1300,9 +1585,27 @@ extension DatasetQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Dataset, Dataset, QDistinct> distinctByTestSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'testSplit');
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QDistinct> distinctByTrainSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'trainSplit');
+    });
+  }
+
   QueryBuilder<Dataset, Dataset, QDistinct> distinctByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'updatedAt');
+    });
+  }
+
+  QueryBuilder<Dataset, Dataset, QDistinct> distinctByValSplit() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'valSplit');
     });
   }
 }
@@ -1345,9 +1648,27 @@ extension DatasetQueryProperty
     });
   }
 
+  QueryBuilder<Dataset, double, QQueryOperations> testSplitProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'testSplit');
+    });
+  }
+
+  QueryBuilder<Dataset, double, QQueryOperations> trainSplitProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'trainSplit');
+    });
+  }
+
   QueryBuilder<Dataset, DateTime, QQueryOperations> updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
+    });
+  }
+
+  QueryBuilder<Dataset, double, QQueryOperations> valSplitProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'valSplit');
     });
   }
 }

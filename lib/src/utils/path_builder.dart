@@ -7,4 +7,8 @@ class PathBuilder {
   static String rawImagesDir({required String projectPath}) {
     return '$projectPath\\raw_images';
   }
+
+  static String summaryJsonPath({required String versionPath}) {
+    return '$versionPath\\summary.json';
+  }
 }

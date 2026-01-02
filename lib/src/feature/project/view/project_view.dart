@@ -44,7 +44,7 @@ class ProjectView extends ConsumerWidget {
                           DataImportFragment(project: project),
                           PreviewFragment(project: project),
                           AnnotateFragment(project: project),
-                          VersionFragment(),
+                          VersionFragment(project: project),
                         ],
                       ),
                     );

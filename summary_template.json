@@ -1,0 +1,16 @@
+{
+  "summary": {
+    "train": {
+      "class_1": 32,
+      "class_2": 32,
+      "class_3": 33
+    },
+    "test": {},
+    "val": {},
+    "total": {
+      "train": 97,
+      "test": 0,
+      "val": 0
+    }
+  }
+}
