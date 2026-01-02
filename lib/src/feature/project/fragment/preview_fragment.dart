@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tmai_pro/src/common/widget/empty.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/project/controller/preview_controller.dart';
+import 'package:tmai_pro/src/feature/project/view/project_view.dart';
 import 'package:tmai_pro/src/feature/project/widget/image_preview_tile.dart';
 
 class PreviewFragment extends ConsumerStatefulWidget {
@@ -18,12 +20,6 @@ class _PreviewFragmentState extends ConsumerState<PreviewFragment> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final previewController = ref.read(
-        previewControllerProvider(widget.project).notifier,
-      );
-      //previewController.loadImages();
-    });
   }
 
   @override
@@ -56,6 +52,20 @@ class _PreviewFragmentState extends ConsumerState<PreviewFragment> {
 
                   if (previewState.errorMessage != null) {
                     return Center(child: Text(previewState.errorMessage!));
+                  }
+
+                  if (previewState.imagePaths.isEmpty) {
+                    return Center(
+                      child: EmptyWidget(
+                        message: "No Images in dataset",
+                        anActionTap: () {
+                          ref
+                              .read(fragmentIndexProvider.notifier)
+                              .update((state) => 0);
+                        },
+                        actionText: "Import Images",
+                      ),
+                    );
                   }
 
                   return GridView.builder(

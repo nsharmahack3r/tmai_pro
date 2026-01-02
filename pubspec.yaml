@@ -27,6 +27,8 @@ dependencies:
 
   flutter_riverpod: ^2.6.1
   file_picker: ^10.3.8
+  lottie:
+  image: ^4.1.0
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +50,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon/
+    - assets/animations/
   # example:
   # fonts:
   #   - family: Schyler

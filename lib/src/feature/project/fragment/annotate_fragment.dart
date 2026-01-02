@@ -1,12 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tmai_pro/src/common/widget/empty.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/annotate/controller/annotation_preview_controller.dart';
 import 'package:tmai_pro/src/feature/annotate/view/annotate_view.dart';
 import 'package:tmai_pro/src/feature/annotate/widget/annotate_summary.dart';
+import 'package:tmai_pro/src/feature/project/view/project_view.dart';
 import 'package:tmai_pro/src/feature/project/widget/annotated_image_preview.dart';
 import 'package:tmai_pro/src/feature/project/widget/annotation_preview_list_tile.dart';
 
@@ -30,7 +30,7 @@ class _AnnotateFragmentState extends ConsumerState<AnnotateFragment> {
         children: [
           Text("Annotation", style: TextStyle(fontSize: 24)),
           SizedBox(height: 12),
-          Flexible(
+          Expanded(
             child: Container(
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -44,6 +44,21 @@ class _AnnotateFragmentState extends ConsumerState<AnnotateFragment> {
                   final state = ref.watch(
                     annotationPreviewControllerProvider(widget.project.path),
                   );
+
+                  if (state.annotatedImagePaths.isEmpty) {
+                    return Center(
+                      child: EmptyWidget(
+                        message: "No Images in dataset",
+                        anActionTap: () {
+                          ref
+                              .read(fragmentIndexProvider.notifier)
+                              .update((state) => 0);
+                        },
+                        actionText: "Import Images",
+                      ),
+                    );
+                  }
+
                   return Row(
                     children: [
                       // All images list

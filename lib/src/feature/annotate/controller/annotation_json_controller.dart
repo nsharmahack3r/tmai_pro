@@ -100,4 +100,28 @@ class AnnotationJsonController {
       );
     }).toList();
   }
+
+  Map<String, int> loadClassCounts() {
+    final file = File(_annotationFilePath);
+
+    if (!file.existsSync()) return {};
+
+    final data = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+
+    final List annotations = data["annotations"] ?? [];
+
+    final Map<String, int> classCounts = {};
+
+    for (final annotation in annotations) {
+      final List boxes = annotation["boxes"] ?? [];
+      for (final box in boxes) {
+        final className = box["className"] ?? "default";
+        classCounts[className] = (classCounts[className] ?? 0) + 1;
+      }
+    }
+
+    print('classCounts: $classCounts');
+
+    return classCounts;
+  }
 }

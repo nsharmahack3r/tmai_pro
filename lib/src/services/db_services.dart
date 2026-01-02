@@ -87,7 +87,7 @@ class DbServices {
 
     return await isar.writeTxn(() async {
       final datasetId = await isar.datasets.put(dataset);
-      project.datasets.add(dataset);
+      project.datasets.add(dataset.copyWith(id: datasetId));
       await project.datasets.save();
       return datasetId;
     });
