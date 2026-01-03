@@ -155,6 +155,15 @@ class AnnotateViewController extends StateNotifier<AnnotationViewState> {
     }
   }
 
+  Future<void> saveCurrnetImage() async {
+    if (state.currentImagePath.isNotEmpty) {
+      _jsonController.saveAnnotations(
+        imagePath: state.currentImagePath,
+        boxes: state.boxes,
+      );
+    }
+  }
+
   Future<void> _switchImage(int newIndex) async {
     final currentPath = state.currentImagePath;
     final newPath = state.images[newIndex];

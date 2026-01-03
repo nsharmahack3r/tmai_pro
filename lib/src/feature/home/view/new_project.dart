@@ -50,6 +50,8 @@ class _NewProjectViewState extends ConsumerState<NewProjectView> {
                 controller: _projectPathController,
                 decoration: InputDecoration(
                   labelText: "Path",
+                  hintText:
+                      "Select a folder where you want to save the project files ->",
                   border: OutlineInputBorder(),
                   suffix: InkWell(
                     child: Icon(Icons.folder, size: 24),
