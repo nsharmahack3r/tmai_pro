@@ -130,7 +130,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance,
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
 
-  if (!window.Create(L"tmai_pro", origin, size)) {
+  if (!window.Create(L"Tmai Pro", origin, size)) {
     DestroyWindow(splash);
     ShutdownGDIPlus();
     return EXIT_FAILURE;

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tmai_pro/src/common/widget/empty.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
+import 'package:tmai_pro/src/feature/home/view/dependency_installation_page.dart';
 import 'package:tmai_pro/src/feature/home/view/new_project.dart';
 import 'package:tmai_pro/src/feature/home/widget/project_list_tile.dart';
 import 'package:tmai_pro/src/feature/home/controller/home_project_controller.dart';
+import 'package:tmai_pro/src/feature/init/controller/env_setup_controller.dart';
+import 'package:tmai_pro/src/feature/init/controller/init_controller.dart';
 import 'package:tmai_pro/src/resource/assets.gen.dart';
 import 'package:tmai_pro/src/services/db_services.dart';
 
@@ -23,10 +27,20 @@ class _HomeViewState extends ConsumerState<HomeView> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(initControllerProvider).init();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final ready = ref.watch(
+      envSetupControllerProvider.select((state) => state.ready),
+    );
+    if (!ready) {
+      return DependencyInstallationPage();
+    }
     return Scaffold(
       body: Row(
         children: [
@@ -34,7 +48,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
             flex: 1,
             child: Container(
               padding: EdgeInsets.all(16),
-              color: Colors.grey.shade900,
               child: Column(
                 children: [
                   Row(
@@ -62,6 +75,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ),
             ),
           ),
+          Container(width: 1, color: Colors.grey),
           Flexible(
             flex: 3,
             child: Padding(
@@ -73,6 +87,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   final projects = snapshot.data!;
+
+                  if (projects.isEmpty) {
+                    return Center(
+                      child: EmptyWidget(
+                        message: "No Projects Available",
+                        anActionTap: () {
+                          context.push(NewProjectView.routePath);
+                        },
+                        actionText: "Create New Project",
+                      ),
+                    );
+                  }
+
                   return ListView.builder(
                     itemCount:
                         projects.length, // Replace with actual project count

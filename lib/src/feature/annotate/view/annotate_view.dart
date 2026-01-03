@@ -44,6 +44,7 @@ class _AnnotateViewState extends ConsumerState<AnnotateView> {
               annotationPreviewControllerProvider(widget.project.path).notifier,
             )
             .reload();
+        controller.saveCurrnetImage();
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Bounding Box Editor')),

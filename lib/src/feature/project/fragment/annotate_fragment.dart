@@ -45,7 +45,7 @@ class _AnnotateFragmentState extends ConsumerState<AnnotateFragment> {
                     annotationPreviewControllerProvider(widget.project.path),
                   );
 
-                  if (state.annotatedImagePaths.isEmpty) {
+                  if (state.imagePaths.isEmpty) {
                     return Center(
                       child: EmptyWidget(
                         message: "No Images in dataset",

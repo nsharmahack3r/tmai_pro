@@ -38,6 +38,8 @@ dev_dependencies:
   isar_generator: *isar_version
   build_runner: any
   flutter_gen_runner: 5.8.0
+  flutter_launcher_icons: ^0.14.4
+  package_rename: ^1.10.1
 
 dependency_overrides:
   flutter_gen_core: 5.8.0

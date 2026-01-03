@@ -1,0 +1,7 @@
+package_rename_config:
+  windows:
+    app_name: "Tmai Pro"
+    organization: "Dartbucket"
+    copyright_notice: "Copyright © 2026"
+    exe_name: "tmai"
+# command :dart run package_rename --path="package_rename_config.yaml"
