@@ -1,8 +1,8 @@
 // src/feature/trained_model/state/training_state.dart
 
-import 'package:tmai_pro/src/feature/train/state/train_config.dart';
+import 'package:fl_chart/fl_chart.dart';
 
-class TrainModelState {
+class TrainingState {
   final bool isTraining;
   final double progress; // 0.0 to 1.0
   final int currentEpoch;
@@ -12,7 +12,10 @@ class TrainModelState {
   final List<String> logs; // Console output for "Advanced View"
   final String? error;
 
-  TrainModelState({
+  final List<FlSpot> lossHistory; // X: Epoch, Y: Loss
+  final List<FlSpot> mapHistory; // X: Epoch, Y: mAP
+
+  TrainingState({
     this.isTraining = false,
     this.progress = 0.0,
     this.currentEpoch = 0,
@@ -21,10 +24,13 @@ class TrainModelState {
     this.currentMap = 0.0,
     this.logs = const [],
     this.error,
+
+    this.lossHistory = const [],
+    this.mapHistory = const [],
   });
 
   // Boilerplate copyWith...
-  TrainModelState copyWith({
+  TrainingState copyWith({
     bool? isTraining,
     double? progress,
     int? currentEpoch,
@@ -33,9 +39,10 @@ class TrainModelState {
     double? currentMap,
     List<String>? logs,
     String? error,
-    TrainingConfig? config,
+    List<FlSpot>? lossHistory,
+    List<FlSpot>? mapHistory,
   }) {
-    return TrainModelState(
+    return TrainingState(
       isTraining: isTraining ?? this.isTraining,
       progress: progress ?? this.progress,
       currentEpoch: currentEpoch ?? this.currentEpoch,
@@ -44,8 +51,10 @@ class TrainModelState {
       currentMap: currentMap ?? this.currentMap,
       logs: logs ?? this.logs,
       error: error ?? this.error,
+      lossHistory: lossHistory ?? this.lossHistory,
+      mapHistory: mapHistory ?? this.mapHistory,
     );
   }
 
-  factory TrainModelState.initial() => TrainModelState();
+  factory TrainingState.initial() => TrainingState();
 }

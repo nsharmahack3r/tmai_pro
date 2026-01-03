@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tmai_pro/src/common/widget/empty.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
+import 'package:tmai_pro/src/feature/project/widget/trainable_config_tile.dart';
 import 'package:tmai_pro/src/feature/train/view/train_model_view.dart';
 import 'package:tmai_pro/src/services/db_services.dart';
 
@@ -53,8 +54,13 @@ class TrainFragment extends StatelessWidget {
                           ),
                         );
                       }
-                      return Container();
-                      // return ListView.separated(itemBuilder: , separatorBuilder: separatorBuilder, itemCount: itemCount)
+                      return ListView.builder(
+                        itemCount: models.length,
+                        itemBuilder: (context, index) {
+                          final model = models[index];
+                          return TrainableConfigTile(modelConfig: model);
+                        },
+                      );
                     },
                   );
                 },

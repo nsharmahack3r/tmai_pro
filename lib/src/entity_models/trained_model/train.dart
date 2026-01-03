@@ -3,7 +3,7 @@ import 'package:tmai_pro/src/entity_models/project/project.dart';
 
 part 'train.g.dart';
 
-enum TrainingStats { ready, complete, error }
+enum TrainingStatus { ready, complete, error }
 
 @collection
 class TrainModel {
@@ -14,6 +14,8 @@ class TrainModel {
   final DateTime createdAt;
   final String? path;
   final String datasetPath;
+  @enumerated
+  final TrainingStatus status;
 
   // Hyperparameters
 
@@ -38,6 +40,8 @@ class TrainModel {
     required this.batchSize,
     required this.learningRate,
     required this.optimizer,
+
+    this.status = TrainingStatus.ready,
   });
 
   TrainModel copyWith({
@@ -46,6 +50,7 @@ class TrainModel {
     DateTime? trainedAt,
     String? path,
     int? id,
+    TrainingStatus? status,
   }) {
     return TrainModel(
       id: id ?? this.id,
@@ -61,6 +66,7 @@ class TrainModel {
       batchSize: batchSize,
       learningRate: learningRate,
       optimizer: optimizer,
+      status: status ?? this.status,
     );
   }
 }

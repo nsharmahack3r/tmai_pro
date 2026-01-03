@@ -92,10 +92,10 @@ BEGIN
             VALUE "CompanyName", "Dartbucket" "\0"
             VALUE "FileDescription", "Tmai Pro" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "Tmai Pro" "\0"
+            VALUE "InternalName", "TmaiPro" "\0"
             VALUE "LegalCopyright", "Copyright © 2026" "\0"
             VALUE "OriginalFilename", "tmai.exe" "\0"
-            VALUE "ProductName", "Tmai Pro" "\0"
+            VALUE "ProductName", "TmaiPro" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,10 +1,12 @@
 import 'package:go_router/go_router.dart';
 import 'package:tmai_pro/src/entity_models/project/project.dart';
+import 'package:tmai_pro/src/entity_models/trained_model/train.dart';
 import 'package:tmai_pro/src/feature/annotate/view/annotate_view.dart';
 import 'package:tmai_pro/src/feature/home/view/home_view.dart';
 import 'package:tmai_pro/src/feature/home/view/new_project.dart';
 import 'package:tmai_pro/src/feature/project/view/project_view.dart';
 import 'package:tmai_pro/src/feature/train/view/train_model_view.dart';
+import 'package:tmai_pro/src/feature/train/view/train_monitoring_view.dart';
 import 'package:tmai_pro/src/feature/version/view/create_version.dart';
 
 final router = GoRouter(
@@ -42,6 +44,12 @@ final router = GoRouter(
       path: TrainModelView.routePath,
       builder: (context, state) =>
           TrainModelView(project: state.extra as Project),
+    ),
+
+    GoRoute(
+      path: TrainingMonitorView.routePath,
+      builder: (context, state) =>
+          TrainingMonitorView(config: state.extra as TrainModel),
     ),
   ],
 );

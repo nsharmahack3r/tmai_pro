@@ -62,8 +62,14 @@ const TrainModelSchema = CollectionSchema(
       name: r'path',
       type: IsarType.string,
     ),
-    r'trainedAt': PropertySchema(
+    r'status': PropertySchema(
       id: 9,
+      name: r'status',
+      type: IsarType.byte,
+      enumMap: _TrainModelstatusEnumValueMap,
+    ),
+    r'trainedAt': PropertySchema(
+      id: 10,
       name: r'trainedAt',
       type: IsarType.dateTime,
     )
@@ -123,7 +129,8 @@ void _trainModelSerialize(
   writer.writeString(offsets[6], object.name);
   writer.writeString(offsets[7], object.optimizer);
   writer.writeString(offsets[8], object.path);
-  writer.writeDateTime(offsets[9], object.trainedAt);
+  writer.writeByte(offsets[9], object.status.index);
+  writer.writeDateTime(offsets[10], object.trainedAt);
 }
 
 TrainModel _trainModelDeserialize(
@@ -143,7 +150,9 @@ TrainModel _trainModelDeserialize(
     name: reader.readString(offsets[6]),
     optimizer: reader.readString(offsets[7]),
     path: reader.readStringOrNull(offsets[8]),
-    trainedAt: reader.readDateTimeOrNull(offsets[9]),
+    status: _TrainModelstatusValueEnumMap[reader.readByteOrNull(offsets[9])] ??
+        TrainingStatus.ready,
+    trainedAt: reader.readDateTimeOrNull(offsets[10]),
   );
   return object;
 }
@@ -174,11 +183,25 @@ P _trainModelDeserializeProp<P>(
     case 8:
       return (reader.readStringOrNull(offset)) as P;
     case 9:
+      return (_TrainModelstatusValueEnumMap[reader.readByteOrNull(offset)] ??
+          TrainingStatus.ready) as P;
+    case 10:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
+
+const _TrainModelstatusEnumValueMap = {
+  'ready': 0,
+  'complete': 1,
+  'error': 2,
+};
+const _TrainModelstatusValueEnumMap = {
+  0: TrainingStatus.ready,
+  1: TrainingStatus.complete,
+  2: TrainingStatus.error,
+};
 
 Id _trainModelGetId(TrainModel object) {
   return object.id;
@@ -1229,6 +1252,59 @@ extension TrainModelQueryFilter
     });
   }
 
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> statusEqualTo(
+      TrainingStatus value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> statusGreaterThan(
+    TrainingStatus value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> statusLessThan(
+    TrainingStatus value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> statusBetween(
+    TrainingStatus lower,
+    TrainingStatus upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'status',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
       trainedAtIsNull() {
     return QueryBuilder.apply(this, (query) {
@@ -1431,6 +1507,18 @@ extension TrainModelQuerySortBy
     });
   }
 
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.desc);
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByTrainedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'trainedAt', Sort.asc);
@@ -1566,6 +1654,18 @@ extension TrainModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.desc);
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByTrainedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'trainedAt', Sort.asc);
@@ -1640,6 +1740,12 @@ extension TrainModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'status');
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByTrainedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'trainedAt');
@@ -1706,6 +1812,12 @@ extension TrainModelQueryProperty
   QueryBuilder<TrainModel, String?, QQueryOperations> pathProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'path');
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainingStatus, QQueryOperations> statusProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'status');
     });
   }
 
