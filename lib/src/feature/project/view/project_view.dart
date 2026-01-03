@@ -4,7 +4,9 @@ import 'package:tmai_pro/src/entity_models/project/project.dart';
 import 'package:tmai_pro/src/feature/project/fragment/annotate_fragment.dart';
 import 'package:tmai_pro/src/feature/project/fragment/data_import_fragment.dart';
 import 'package:tmai_pro/src/feature/project/fragment/preview_fragment.dart';
+import 'package:tmai_pro/src/feature/project/fragment/train_fragment.dart';
 import 'package:tmai_pro/src/feature/project/fragment/version_fragment.dart';
+import 'package:tmai_pro/src/feature/project/fragment/visulaize_fragment.dart';
 import 'package:tmai_pro/src/feature/project/widget/project_naviation.dart';
 import 'package:tmai_pro/src/services/db_services.dart';
 
@@ -45,6 +47,8 @@ class ProjectView extends ConsumerWidget {
                           PreviewFragment(project: project),
                           AnnotateFragment(project: project),
                           VersionFragment(project: project),
+                          TrainFragment(project: project),
+                          VisualizeFragment(project: project),
                         ],
                       ),
                     );

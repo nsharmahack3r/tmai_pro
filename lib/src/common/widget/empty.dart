@@ -21,7 +21,12 @@ class EmptyWidget extends StatelessWidget {
       children: [
         Lottie.asset(Assets.animations.empty),
         Text(message),
-        MaterialButton(onPressed: anActionTap, child: Text(actionText)),
+        SizedBox(height: 12),
+        MaterialButton(
+          onPressed: anActionTap,
+          color: Colors.green,
+          child: Text(actionText),
+        ),
       ],
     );
   }

@@ -17,23 +17,53 @@ const TrainModelSchema = CollectionSchema(
   name: r'TrainModel',
   id: -7074258509332360808,
   properties: {
-    r'modelId': PropertySchema(
+    r'batchSize': PropertySchema(
       id: 0,
+      name: r'batchSize',
+      type: IsarType.long,
+    ),
+    r'createdAt': PropertySchema(
+      id: 1,
+      name: r'createdAt',
+      type: IsarType.dateTime,
+    ),
+    r'datasetPath': PropertySchema(
+      id: 2,
+      name: r'datasetPath',
+      type: IsarType.string,
+    ),
+    r'epochs': PropertySchema(
+      id: 3,
+      name: r'epochs',
+      type: IsarType.long,
+    ),
+    r'learningRate': PropertySchema(
+      id: 4,
+      name: r'learningRate',
+      type: IsarType.double,
+    ),
+    r'modelId': PropertySchema(
+      id: 5,
       name: r'modelId',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 1,
+      id: 6,
       name: r'name',
       type: IsarType.string,
     ),
+    r'optimizer': PropertySchema(
+      id: 7,
+      name: r'optimizer',
+      type: IsarType.string,
+    ),
     r'path': PropertySchema(
-      id: 2,
+      id: 8,
       name: r'path',
       type: IsarType.string,
     ),
     r'trainedAt': PropertySchema(
-      id: 3,
+      id: 9,
       name: r'trainedAt',
       type: IsarType.dateTime,
     )
@@ -65,8 +95,10 @@ int _trainModelEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.datasetPath.length * 3;
   bytesCount += 3 + object.modelId.length * 3;
   bytesCount += 3 + object.name.length * 3;
+  bytesCount += 3 + object.optimizer.length * 3;
   {
     final value = object.path;
     if (value != null) {
@@ -82,10 +114,16 @@ void _trainModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.modelId);
-  writer.writeString(offsets[1], object.name);
-  writer.writeString(offsets[2], object.path);
-  writer.writeDateTime(offsets[3], object.trainedAt);
+  writer.writeLong(offsets[0], object.batchSize);
+  writer.writeDateTime(offsets[1], object.createdAt);
+  writer.writeString(offsets[2], object.datasetPath);
+  writer.writeLong(offsets[3], object.epochs);
+  writer.writeDouble(offsets[4], object.learningRate);
+  writer.writeString(offsets[5], object.modelId);
+  writer.writeString(offsets[6], object.name);
+  writer.writeString(offsets[7], object.optimizer);
+  writer.writeString(offsets[8], object.path);
+  writer.writeDateTime(offsets[9], object.trainedAt);
 }
 
 TrainModel _trainModelDeserialize(
@@ -95,11 +133,17 @@ TrainModel _trainModelDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = TrainModel(
+    batchSize: reader.readLong(offsets[0]),
+    createdAt: reader.readDateTime(offsets[1]),
+    datasetPath: reader.readString(offsets[2]),
+    epochs: reader.readLong(offsets[3]),
     id: id,
-    modelId: reader.readString(offsets[0]),
-    name: reader.readString(offsets[1]),
-    path: reader.readStringOrNull(offsets[2]),
-    trainedAt: reader.readDateTime(offsets[3]),
+    learningRate: reader.readDouble(offsets[4]),
+    modelId: reader.readString(offsets[5]),
+    name: reader.readString(offsets[6]),
+    optimizer: reader.readString(offsets[7]),
+    path: reader.readStringOrNull(offsets[8]),
+    trainedAt: reader.readDateTimeOrNull(offsets[9]),
   );
   return object;
 }
@@ -112,13 +156,25 @@ P _trainModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
-    case 2:
-      return (reader.readStringOrNull(offset)) as P;
-    case 3:
       return (reader.readDateTime(offset)) as P;
+    case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
+      return (reader.readLong(offset)) as P;
+    case 4:
+      return (reader.readDouble(offset)) as P;
+    case 5:
+      return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readString(offset)) as P;
+    case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
+      return (reader.readStringOrNull(offset)) as P;
+    case 9:
+      return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -215,6 +271,303 @@ extension TrainModelQueryWhere
 
 extension TrainModelQueryFilter
     on QueryBuilder<TrainModel, TrainModel, QFilterCondition> {
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> batchSizeEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'batchSize',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      batchSizeGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'batchSize',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> batchSizeLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'batchSize',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> batchSizeBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'batchSize',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> createdAtEqualTo(
+      DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'createdAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      createdAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'createdAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> createdAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'createdAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> createdAtBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'createdAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'datasetPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'datasetPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'datasetPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'datasetPath',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'datasetPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'datasetPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'datasetPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'datasetPath',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'datasetPath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      datasetPathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'datasetPath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> epochsEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'epochs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> epochsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'epochs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> epochsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'epochs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> epochsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'epochs',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -264,6 +617,72 @@ extension TrainModelQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      learningRateEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'learningRate',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      learningRateGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'learningRate',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      learningRateLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'learningRate',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      learningRateBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'learningRate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -530,6 +949,140 @@ extension TrainModelQueryFilter
     });
   }
 
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> optimizerEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'optimizer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      optimizerGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'optimizer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> optimizerLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'optimizer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> optimizerBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'optimizer',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      optimizerStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'optimizer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> optimizerEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'optimizer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> optimizerContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'optimizer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> optimizerMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'optimizer',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      optimizerIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'optimizer',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      optimizerIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'optimizer',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> pathIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -676,8 +1229,26 @@ extension TrainModelQueryFilter
     });
   }
 
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      trainedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'trainedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
+      trainedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'trainedAt',
+      ));
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> trainedAtEqualTo(
-      DateTime value) {
+      DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'trainedAt',
@@ -688,7 +1259,7 @@ extension TrainModelQueryFilter
 
   QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition>
       trainedAtGreaterThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -701,7 +1272,7 @@ extension TrainModelQueryFilter
   }
 
   QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> trainedAtLessThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -714,8 +1285,8 @@ extension TrainModelQueryFilter
   }
 
   QueryBuilder<TrainModel, TrainModel, QAfterFilterCondition> trainedAtBetween(
-    DateTime lower,
-    DateTime upper, {
+    DateTime? lower,
+    DateTime? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -752,6 +1323,66 @@ extension TrainModelQueryLinks
 
 extension TrainModelQuerySortBy
     on QueryBuilder<TrainModel, TrainModel, QSortBy> {
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByBatchSize() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchSize', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByBatchSizeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchSize', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByCreatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByDatasetPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'datasetPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByDatasetPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'datasetPath', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByEpochs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'epochs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByEpochsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'epochs', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByLearningRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByLearningRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningRate', Sort.desc);
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByModelId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'modelId', Sort.asc);
@@ -773,6 +1404,18 @@ extension TrainModelQuerySortBy
   QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByOptimizer() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'optimizer', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> sortByOptimizerDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'optimizer', Sort.desc);
     });
   }
 
@@ -803,6 +1446,54 @@ extension TrainModelQuerySortBy
 
 extension TrainModelQuerySortThenBy
     on QueryBuilder<TrainModel, TrainModel, QSortThenBy> {
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByBatchSize() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchSize', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByBatchSizeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchSize', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByCreatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByDatasetPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'datasetPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByDatasetPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'datasetPath', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByEpochs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'epochs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByEpochsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'epochs', Sort.desc);
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -812,6 +1503,18 @@ extension TrainModelQuerySortThenBy
   QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByLearningRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByLearningRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningRate', Sort.desc);
     });
   }
 
@@ -836,6 +1539,18 @@ extension TrainModelQuerySortThenBy
   QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByOptimizer() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'optimizer', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QAfterSortBy> thenByOptimizerDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'optimizer', Sort.desc);
     });
   }
 
@@ -866,6 +1581,37 @@ extension TrainModelQuerySortThenBy
 
 extension TrainModelQueryWhereDistinct
     on QueryBuilder<TrainModel, TrainModel, QDistinct> {
+  QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByBatchSize() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'batchSize');
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'createdAt');
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByDatasetPath(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'datasetPath', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByEpochs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'epochs');
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByLearningRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'learningRate');
+    });
+  }
+
   QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByModelId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -877,6 +1623,13 @@ extension TrainModelQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<TrainModel, TrainModel, QDistinct> distinctByOptimizer(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'optimizer', caseSensitive: caseSensitive);
     });
   }
 
@@ -902,6 +1655,36 @@ extension TrainModelQueryProperty
     });
   }
 
+  QueryBuilder<TrainModel, int, QQueryOperations> batchSizeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'batchSize');
+    });
+  }
+
+  QueryBuilder<TrainModel, DateTime, QQueryOperations> createdAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<TrainModel, String, QQueryOperations> datasetPathProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'datasetPath');
+    });
+  }
+
+  QueryBuilder<TrainModel, int, QQueryOperations> epochsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'epochs');
+    });
+  }
+
+  QueryBuilder<TrainModel, double, QQueryOperations> learningRateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'learningRate');
+    });
+  }
+
   QueryBuilder<TrainModel, String, QQueryOperations> modelIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'modelId');
@@ -914,13 +1697,19 @@ extension TrainModelQueryProperty
     });
   }
 
+  QueryBuilder<TrainModel, String, QQueryOperations> optimizerProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'optimizer');
+    });
+  }
+
   QueryBuilder<TrainModel, String?, QQueryOperations> pathProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'path');
     });
   }
 
-  QueryBuilder<TrainModel, DateTime, QQueryOperations> trainedAtProperty() {
+  QueryBuilder<TrainModel, DateTime?, QQueryOperations> trainedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'trainedAt');
     });

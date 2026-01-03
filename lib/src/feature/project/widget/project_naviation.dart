@@ -82,17 +82,17 @@ class ProjectNaviation extends ConsumerWidget {
                 title: "Train",
                 icon: Icons.model_training,
                 onTap: () {
-                  // TODO: handle train navigation
+                  ref.read(fragmentIndexProvider.notifier).update((index) => 4);
                 },
-                selected: false,
+                selected: selectedIndex == 4,
               ),
               ProjectNavigationOption(
                 title: "Visualize",
                 icon: Icons.pie_chart,
                 onTap: () {
-                  // TODO: handle visualize navigation
+                  ref.read(fragmentIndexProvider.notifier).update((index) => 5);
                 },
-                selected: false,
+                selected: selectedIndex == 5,
               ),
               SizedBox(height: 24),
               // Models

@@ -124,7 +124,7 @@ class DbServices {
 
     return await isar.writeTxn(() async {
       final modelId = await isar.trainModels.put(model);
-      project.models.add(model);
+      project.models.add(model.copyWith(id: modelId));
       await project.models.save();
       return modelId;
     });
@@ -231,23 +231,8 @@ class DbServices {
         }
 
         /* ───── MODELS (5 per project) ───── */
-        for (int m = 1; m <= 5; m++) {
-          final model = TrainModel(
-            name: 'Project $p - Model $m',
-            modelId: 'yolo_v8_${p}_$m',
-            trainedAt: DateTime.now(),
-            path: '/models/project_$p/model_$m.pt',
-          );
-
-          final modelId = await isar.trainModels.put(model);
-          final savedModel = await isar.trainModels.get(modelId);
-          if (savedModel != null) {
-            savedProject.models.add(savedModel);
-          }
-        }
 
         await savedProject.datasets.save();
-        await savedProject.models.save();
       }
     });
   }

@@ -4,6 +4,7 @@ import 'package:tmai_pro/src/feature/annotate/view/annotate_view.dart';
 import 'package:tmai_pro/src/feature/home/view/home_view.dart';
 import 'package:tmai_pro/src/feature/home/view/new_project.dart';
 import 'package:tmai_pro/src/feature/project/view/project_view.dart';
+import 'package:tmai_pro/src/feature/train/view/train_model_view.dart';
 import 'package:tmai_pro/src/feature/version/view/create_version.dart';
 
 final router = GoRouter(
@@ -35,6 +36,12 @@ final router = GoRouter(
       path: CreateVersionPage.routePath,
       builder: (context, state) =>
           CreateVersionPage(project: state.extra as Project),
+    ),
+
+    GoRoute(
+      path: TrainModelView.routePath,
+      builder: (context, state) =>
+          TrainModelView(project: state.extra as Project),
     ),
   ],
 );
